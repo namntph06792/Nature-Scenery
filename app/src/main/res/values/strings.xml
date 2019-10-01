@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">Assignment403</string>
+    <string name="app_name">Nature Scenery</string>
+
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>
