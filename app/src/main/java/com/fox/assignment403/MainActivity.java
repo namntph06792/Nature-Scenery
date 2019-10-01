@@ -5,8 +5,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Window;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -16,7 +18,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.fox.assignment403.adapter.StaggeredRecycleViewAdapter;
 import com.fox.assignment403.model.FavoritePhoto;
-import com.fox.assignment403.model.Photo;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import static com.fox.assignment403.constant.Constants.FAVOURITE_PHOTO_API;
 
 public class MainActivity extends AppCompatActivity {
 
+    private ProgressDialog progressDialog;
     private static final int NUM_COLUMNS = 2;
 
     private List<String> mImageUrls = new ArrayList<>();
@@ -34,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+        getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
         initImageBitmaps();
     }
@@ -52,14 +56,18 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("aa",favoritePhoto.getPhotos().getPhoto().get(i).getUrlM() + "");
                 }
                 initRecyclerView();
+                progressDialog.dismiss();
+
             }
         }, new com.android.volley.Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(MainActivity.this, "Something wrong happened !", Toast.LENGTH_SHORT).show();
+                progressDialog.dismiss();
             }
         });
         queue.add(request);
+        initProgressDialog();
     }
 
     private void initRecyclerView(){
@@ -68,6 +76,17 @@ public class MainActivity extends AppCompatActivity {
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
         recyclerView.setAdapter(staggeredRecyclerViewAdapter);
+    }
+
+    private void initProgressDialog(){
+        progressDialog = new ProgressDialog(MainActivity.this);
+        progressDialog.setTitle("Waiting");
+        progressDialog.setMessage("Loading image from network ...");
+        progressDialog.setProgressStyle(progressDialog.STYLE_HORIZONTAL);
+        progressDialog.setCancelable(false);
+        //progressDialog.setMax(100);
+        //progressDialog.setProgress(0);
+        progressDialog.show();
     }
 
 }
