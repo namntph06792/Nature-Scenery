@@ -9,12 +9,14 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.fox.assignment403.R;
+import com.fox.assignment403.model.Photo;
 
 import java.util.List;
 
@@ -22,12 +24,16 @@ public class StaggeredRecycleViewAdapter extends RecyclerView.Adapter<StaggeredR
 
     private static final String TAG = "StaggeredRecycleViewAd";
 
-    private List<String> mImageUrls;
+    private List<Photo> mImageUrls;
     private Context mContext;
 
     private ConstraintSet constraintSet = new ConstraintSet();
 
-    public StaggeredRecycleViewAdapter(Context mContext, List<String> mImageUrls) {
+    public ConstraintSet getConstraintSet() {
+        return constraintSet;
+    }
+
+    public StaggeredRecycleViewAdapter(Context mContext, List<Photo> mImageUrls) {
         this.mImageUrls = mImageUrls;
         this.mContext = mContext;
     }
@@ -40,12 +46,12 @@ public class StaggeredRecycleViewAdapter extends RecyclerView.Adapter<StaggeredR
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
-
+        final Photo photo = mImageUrls.get(position);
         Log.d(TAG,"onBindViewHolder : called.");
         RequestOptions requestOptions = new RequestOptions();
         requestOptions.placeholder(R.drawable.dummy);
         Glide.with(mContext)
-                .load(mImageUrls.get(position))
+                .load(photo.getUrlO() != null ? photo.getUrlO() : photo.getUrlL())
                 .error(R.drawable.dummy)
                 .apply(requestOptions)
                 .into(holder.imageView);
@@ -54,12 +60,14 @@ public class StaggeredRecycleViewAdapter extends RecyclerView.Adapter<StaggeredR
             @Override
             public void onClick(View v) {
                 Log.d(TAG,"onClick: clicked on:  " + mImageUrls.get(position));
-                Toast.makeText(mContext,mImageUrls.get(position),Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext,photo.getUrlO() != null ? photo.getUrlO() : photo.getUrlL(),Toast.LENGTH_SHORT).show();
             }
         });
 
-        String ratio = String.format("%d:%d");
-        //constraintSet.clone(holder.);
+        String ratio = String.format("%d:%d",photo.getUrlO() != null ? Integer.parseInt(photo.getWidthO()) : Integer.parseInt(photo.getWidthL()),photo.getUrlO() != null ? Integer.parseInt(photo.getHeightO()) : Integer.parseInt(photo.getHeightL()));
+        constraintSet.clone(holder.constraintLayout);
+        constraintSet.setDimensionRatio(holder.imageView.getId(),ratio);
+        constraintSet.applyTo(holder.constraintLayout);
     }
 
     @Override
@@ -67,22 +75,24 @@ public class StaggeredRecycleViewAdapter extends RecyclerView.Adapter<StaggeredR
         return mImageUrls.size();
     }
 
-    public void clear(){
+    public void onClear(){
         mImageUrls.clear();
         notifyDataSetChanged();
     }
 
-    public void addAll(String list){
+    public void onUpdate(Photo list){
         mImageUrls.add(list);
         notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
+        private ConstraintLayout constraintLayout;
         private ImageView imageView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            this.constraintLayout = itemView.findViewById(R.id.constrainContainer);
             this.imageView = itemView.findViewById(R.id.imageView_widget);
         }
 

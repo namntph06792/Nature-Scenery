@@ -23,4 +23,7 @@ public class Constants {
             "&" + "per_page=" + OPTION_PER_PAGE +
             "&" + "page=" + OPTION_PAGE +
             "&" + "format=" + FORMAT;
+
+    public static final int NUM_COLUMNS = 2;
+
 }

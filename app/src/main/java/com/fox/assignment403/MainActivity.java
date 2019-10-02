@@ -1,7 +1,6 @@
 package com.fox.assignment403;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -19,21 +18,24 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.fox.assignment403.adapter.StaggeredRecycleViewAdapter;
 import com.fox.assignment403.model.FavoritePhoto;
+import com.fox.assignment403.model.Photo;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.fox.assignment403.constant.Constants.FAVOURITE_PHOTO_API;
+import static com.fox.assignment403.constant.Constants.NUM_COLUMNS;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private ProgressDialog progressDialog;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private static final int NUM_COLUMNS = 2;
+    private RecyclerView recyclerView;
+    private StaggeredRecycleViewAdapter staggeredRecyclerViewAdapter;
 
-    private List<String> mImageUrls = new ArrayList<>();
+    private List<Photo> mImageUrls = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,50 +44,74 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
         initViews();
-        initImageBitmaps();
+        fetchPhotoAsync(0);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-
+                fetchPhotoAsync(1);
             }
         });
+    }
+
+    private void fetchPhotoAsync(int i) {
+        //0 : Fetch new data
+        //1: Refresh and load new data
+        if(i == 0){
+            RequestQueue queue = Volley.newRequestQueue(this);
+            StringRequest request = new StringRequest(Request.Method.GET, FAVOURITE_PHOTO_API, new com.android.volley.Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    FavoritePhoto favoritePhoto = new Gson().fromJson(response,FavoritePhoto.class);
+                    Log.d("Response",favoritePhoto.getPhotos().getPhoto() + "");
+                    for(int i = 0;i < favoritePhoto.getPhotos().getPhoto().size();i++){
+                        mImageUrls.add(favoritePhoto.getPhotos().getPhoto().get(i));
+                        Log.d("aa",favoritePhoto.getPhotos().getPhoto().get(i) + "");
+                    }
+                    initRecyclerView();
+                    progressDialog.dismiss();
+
+                }
+            }, new com.android.volley.Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(MainActivity.this, "Something wrong happened !", Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
+                }
+            });
+            queue.add(request);
+            initProgressDialog();
+        }else {
+            RequestQueue queue = Volley.newRequestQueue(this);
+            StringRequest request = new StringRequest(Request.Method.GET, FAVOURITE_PHOTO_API, new com.android.volley.Response.Listener<String>() {
+
+                @Override
+                public void onResponse(String response) {
+                    FavoritePhoto favoritePhoto = new Gson().fromJson(response,FavoritePhoto.class);
+                    Log.d("Response",favoritePhoto.getPhotos().getPhoto() + "");
+                    staggeredRecyclerViewAdapter.onClear();
+                    for(int i = 0;i < favoritePhoto.getPhotos().getPhoto().size();i++){
+                        staggeredRecyclerViewAdapter.onUpdate(favoritePhoto.getPhotos().getPhoto().get(i));
+                    }
+                    initRecyclerView();
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+            }, new com.android.volley.Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(MainActivity.this, "Something wrong happened !", Toast.LENGTH_SHORT).show();
+                }
+            });
+            queue.add(request);
+        }
     }
 
     private void initViews(){
         swipeRefreshLayout = findViewById(R.id.swipeContainer);
-    }
-
-    private void initImageBitmaps(){
-        RequestQueue queue = Volley.newRequestQueue(this);
-        StringRequest request = new StringRequest(Request.Method.GET, FAVOURITE_PHOTO_API, new com.android.volley.Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                FavoritePhoto favoritePhoto = new Gson().fromJson(response,FavoritePhoto.class);
-                //Log.d("Response",response);
-                //Toast.makeText(MainActivity.this, favoritePhoto.getPhotos().getPhoto() + "", Toast.LENGTH_SHORT).show();
-                Log.d("Response",favoritePhoto.getPhotos().getPhoto() + "");
-                for(int i = 0;i < favoritePhoto.getPhotos().getPhoto().size();i++){
-                    mImageUrls.add(favoritePhoto.getPhotos().getPhoto().get(i).getUrlM());
-                    Log.d("aa",favoritePhoto.getPhotos().getPhoto().get(i).getUrlM() + "");
-                }
-                initRecyclerView();
-                progressDialog.dismiss();
-
-            }
-        }, new com.android.volley.Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(MainActivity.this, "Something wrong happened !", Toast.LENGTH_SHORT).show();
-                progressDialog.dismiss();
-            }
-        });
-        queue.add(request);
-        initProgressDialog();
+        recyclerView = findViewById(R.id.recycleView);
+        staggeredRecyclerViewAdapter = new StaggeredRecycleViewAdapter(MainActivity.this, mImageUrls);
     }
 
     private void initRecyclerView(){
-        RecyclerView recyclerView = findViewById(R.id.recycleView);
-        StaggeredRecycleViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecycleViewAdapter(this, mImageUrls);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, 1);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
         recyclerView.setAdapter(staggeredRecyclerViewAdapter);

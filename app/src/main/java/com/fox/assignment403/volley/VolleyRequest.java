@@ -16,7 +16,6 @@ import com.google.gson.Gson;
 
 public class VolleyRequest {
 //    private Context mContext;
-//    private Constants constants = new Constants(API_KEY, USER_ID);
 //
 //    public VolleyRequest(Context mContext) {
 //        this.mContext = mContext;
