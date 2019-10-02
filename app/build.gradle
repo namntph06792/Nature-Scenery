@@ -18,8 +18,8 @@ android {
         }
     }
     buildTypes.each {
-        it.buildConfigField 'String' , 'API_KEY' , API_KEY
-        it.buildConfigField 'String' , 'USER_ID' , USER_ID
+        it.buildConfigField 'String', 'API_KEY', API_KEY
+        it.buildConfigField 'String', 'USER_ID', USER_ID
     }
 }
 
@@ -44,4 +44,6 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.10.0'
     //SwipeRefreshLayout
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha02'
+    //Floating Action Button
+    implementation 'com.getbase:floatingactionbutton:1.10.1'
 }

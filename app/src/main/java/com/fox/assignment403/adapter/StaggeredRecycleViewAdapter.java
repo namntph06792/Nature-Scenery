@@ -1,6 +1,7 @@
 package com.fox.assignment403.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.fox.assignment403.PreviewPhotoActivity;
 import com.fox.assignment403.R;
 import com.fox.assignment403.model.Photo;
 
@@ -59,8 +61,11 @@ public class StaggeredRecycleViewAdapter extends RecyclerView.Adapter<StaggeredR
         holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG,"onClick: clicked on:  " + mImageUrls.get(position));
-                Toast.makeText(mContext,photo.getUrlO() != null ? photo.getUrlO() : photo.getUrlL(),Toast.LENGTH_SHORT).show();
+                //Log.d(TAG,"onClick: clicked on:  " + mImageUrls.get(position));
+                //Toast.makeText(mContext,photo.getUrlO() != null ? photo.getUrlO() : photo.getUrlL(),Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(mContext, PreviewPhotoActivity.class);
+                intent.putExtra("photo",photo);
+                mContext.startActivity(intent);
             }
         });
 

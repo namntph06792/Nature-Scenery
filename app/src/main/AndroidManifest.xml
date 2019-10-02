@@ -11,6 +11,7 @@
         android:roundIcon="@drawable/android_q_logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".PreviewPhotoActivity"></activity>
         <activity
             android:name=".SplashActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -22,8 +23,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity">
-        </activity>
+        <activity android:name=".MainActivity"></activity>
     </application>
 
 </manifest>
