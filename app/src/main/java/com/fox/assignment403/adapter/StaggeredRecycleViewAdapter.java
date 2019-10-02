@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -24,6 +25,8 @@ public class StaggeredRecycleViewAdapter extends RecyclerView.Adapter<StaggeredR
     private List<String> mImageUrls;
     private Context mContext;
 
+    private ConstraintSet constraintSet = new ConstraintSet();
+
     public StaggeredRecycleViewAdapter(Context mContext, List<String> mImageUrls) {
         this.mImageUrls = mImageUrls;
         this.mContext = mContext;
@@ -37,6 +40,7 @@ public class StaggeredRecycleViewAdapter extends RecyclerView.Adapter<StaggeredR
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+
         Log.d(TAG,"onBindViewHolder : called.");
         RequestOptions requestOptions = new RequestOptions();
         requestOptions.placeholder(R.drawable.dummy);
@@ -53,11 +57,24 @@ public class StaggeredRecycleViewAdapter extends RecyclerView.Adapter<StaggeredR
                 Toast.makeText(mContext,mImageUrls.get(position),Toast.LENGTH_SHORT).show();
             }
         });
+
+        String ratio = String.format("%d:%d");
+        //constraintSet.clone(holder.);
     }
 
     @Override
     public int getItemCount() {
         return mImageUrls.size();
+    }
+
+    public void clear(){
+        mImageUrls.clear();
+        notifyDataSetChanged();
+    }
+
+    public void addAll(String list){
+        mImageUrls.add(list);
+        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{

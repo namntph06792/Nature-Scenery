@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ import static com.fox.assignment403.constant.Constants.FAVOURITE_PHOTO_API;
 public class MainActivity extends AppCompatActivity {
 
     private ProgressDialog progressDialog;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private static final int NUM_COLUMNS = 2;
 
     private List<String> mImageUrls = new ArrayList<>();
@@ -39,7 +41,18 @@ public class MainActivity extends AppCompatActivity {
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
+        initViews();
         initImageBitmaps();
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+            }
+        });
+    }
+
+    private void initViews(){
+        swipeRefreshLayout = findViewById(R.id.swipeContainer);
     }
 
     private void initImageBitmaps(){
@@ -73,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
     private void initRecyclerView(){
         RecyclerView recyclerView = findViewById(R.id.recycleView);
         StaggeredRecycleViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecycleViewAdapter(this, mImageUrls);
-        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, 1);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
         recyclerView.setAdapter(staggeredRecyclerViewAdapter);
     }

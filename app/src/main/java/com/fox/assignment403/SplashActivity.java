@@ -17,19 +17,21 @@ public class SplashActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT < 16) {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+            //getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+            supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
             getSupportActionBar().hide();
         }else{
             View decorView = getWindow().getDecorView();
             // Hide the status bar.
             int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
             decorView.setSystemUiVisibility(uiOptions);
-            getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+            //getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+            supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
             getSupportActionBar().hide();
         }
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         new Handler().postDelayed(new Runnable() {
             @Override
