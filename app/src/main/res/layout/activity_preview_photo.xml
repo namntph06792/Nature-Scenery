@@ -31,7 +31,6 @@
         fab:fab_addButtonPlusIconColor="@color/half_black"
         fab:fab_labelStyle="@style/menu_labels_style">
 
-
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
 </RelativeLayout>

@@ -15,6 +15,7 @@ import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import com.fox.assignment403.PreviewPhotoActivity;
 import com.fox.assignment403.R;
@@ -56,6 +57,7 @@ public class StaggeredRecycleViewAdapter extends RecyclerView.Adapter<StaggeredR
                 .load(photo.getUrlO() != null ? photo.getUrlO() : photo.getUrlL())
                 .error(R.drawable.dummy)
                 .apply(requestOptions)
+                .transition(new DrawableTransitionOptions().crossFade())
                 .into(holder.imageView);
 
         holder.imageView.setOnClickListener(new View.OnClickListener() {
