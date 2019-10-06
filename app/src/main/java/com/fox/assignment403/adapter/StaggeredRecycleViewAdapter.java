@@ -93,7 +93,6 @@ public class StaggeredRecycleViewAdapter extends RecyclerView.Adapter<StaggeredR
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
-
         private ConstraintLayout constraintLayout;
         private ImageView imageView;
 
@@ -102,7 +101,6 @@ public class StaggeredRecycleViewAdapter extends RecyclerView.Adapter<StaggeredR
             this.constraintLayout = itemView.findViewById(R.id.constrainContainer);
             this.imageView = itemView.findViewById(R.id.imageView_widget);
         }
-
     }
 
 }

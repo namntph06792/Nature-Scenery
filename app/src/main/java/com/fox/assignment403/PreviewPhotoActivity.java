@@ -1,42 +1,45 @@
 package com.fox.assignment403;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.Manifest;
-import android.content.BroadcastReceiver;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 import android.view.Window;
+import android.webkit.MimeTypeMap;
+import android.webkit.URLUtil;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import com.fox.assignment403.model.Photo;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
 import java.io.File;
+import java.io.IOException;
 
-import static com.fox.assignment403.constant.Constants.PERMISSION_REQUEST_CODE;
-import static com.fox.assignment403.constant.Constants.PROGRESS_UPDATE;
+import static com.fox.assignment403.constant.Constants.MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE;
 
 public class PreviewPhotoActivity extends AppCompatActivity {
 
     private Photo photo;
     private ImageView imageView;
-    //private String url_m, url_z, url_c, url_l, url_o;
     private FloatingActionsMenu menuMultipleActions;
-    private String [] link = null;
-
+    public static final String MESSAGE_PROGRESS  = "message_progress";
+    private String [] link = new String[10];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,9 +55,10 @@ public class PreviewPhotoActivity extends AppCompatActivity {
         RequestOptions requestOptions = new RequestOptions();
         requestOptions.placeholder(R.drawable.dummy);
         Glide.with(PreviewPhotoActivity.this)
-                .load(photo.getUrlO() != null ? photo.getUrlO() : photo.getUrlL())
+                .load(photo.getUrlO() != null ? photo.getUrlO().trim() : photo.getUrlL().trim())
                 .error(R.drawable.dummy)
                 .apply(requestOptions)
+                .transition(new DrawableTransitionOptions().crossFade())
                 .into(imageView);
         //Add button download <m,z,c,l,o>
         getPhotoUrl();
@@ -67,14 +71,14 @@ public class PreviewPhotoActivity extends AppCompatActivity {
     }
 
     private void getPhotoUrl(){
-        link[0] = photo.getUrlO();
-        link[1] = photo.getUrlL();
-        link[2] = photo.getUrlC();
-        link[3] = photo.getUrlZ();
-        link[4] = photo.getUrlM();
+        link[0] = photo.getUrlO().trim();
+        link[1] = photo.getUrlL().trim();
+        link[2] = photo.getUrlC().trim();
+        link[3] = photo.getUrlZ().trim();
+        link[4] = photo.getUrlM().trim();
     }
 
-    private void initDownloadButton(String [] url){
+    private void initDownloadButton(final String [] url){
         for(int i = 0;i < url.length;i++){
             if(url[i] != null){
                 FloatingActionButton floatingActionButton = new FloatingActionButton(PreviewPhotoActivity.this);
@@ -99,62 +103,95 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                 floatingActionButton.setColorNormalResId(R.color.blue_semi_transparent);
                 floatingActionButton.setColorPressedResId(R.color.blue_semi_transparent_pressed);
                 floatingActionButton.setStrokeVisible(false);
+                final int j = i;
                 floatingActionButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(checkPermission()){
-                            onDownloadPhoto();
-                        }else{
-                            requestPermissions();
+                        try {
+                            checkPermission(url[j]);
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                     }
                 });
-                registerReceiver();
                 menuMultipleActions.addButton(floatingActionButton);
             }
         }
     }
 
-    private void onDownloadPhoto() {
-    }
-
-    private boolean checkPermission(){
-        int result = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        return result == PackageManager.PERMISSION_GRANTED;
-    }
-
-    private void requestPermissions(){
-        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
-    }
-
-    private void registerReceiver() {
-        LocalBroadcastManager bManager = LocalBroadcastManager.getInstance(this);
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(PROGRESS_UPDATE);
-        bManager.registerReceiver(mBroadcastReceiver, intentFilter);
-    }
-
-    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            if (intent.getAction().equals(PROGRESS_UPDATE)) {
-
-                boolean downloadComplete = intent.getBooleanExtra("downloadComplete", false);
-                //Log.d("API123", download.getProgress() + " current progress");
-
-                if (downloadComplete) {
-
-                    Toast.makeText(getApplicationContext(), "File download completed", Toast.LENGTH_SHORT).show();
-
-                    File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + File.separator +
-                            "journaldev-image-downloaded.jpg");
-
-                    Glide.with(context).load(file).into(imageView);
-
-                }
-            }
+    private void downloadPhotoFromApi(String mUrl) throws IOException {
+        File rootDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Flickr");
+        if(!rootDirectory.exists()){
+            rootDirectory.mkdir();
         }
-    };
+        //String fileName = "image" + " " + System.currentTimeMillis();
+        String fileName = URLUtil.guessFileName(mUrl, null, MimeTypeMap.getFileExtensionFromUrl(mUrl));
+        //File file = new File(rootDirectory, fileName);
+        //file.createNewFile();
+        //Create download request
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(mUrl.trim()));
+        //Allow type of network to download files
+        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+        request.setAllowedOverRoaming(false);
+        request.setTitle("File Download"); //Set title in download notification
+        request.setDescription("File is being downloaded..."); ////Set description in download notification
+        request.allowScanningByMediaScanner();
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName); //Get current timestamp as file name
+        request.setVisibleInDownloadsUi(true);
+        //Get download service and enqueue file
+        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+        manager.enqueue(request);
+    }
+
+    private void checkPermission(String mUrl) throws IOException {
+        if(Build.VERSION.SDK_INT >= 23){
+            if (ContextCompat.checkSelfPermission(PreviewPhotoActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                // Permission is not granted
+                // Should we show an explanation?
+                if (ActivityCompat.shouldShowRequestPermissionRationale(PreviewPhotoActivity.this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    // Show an explanation to the user *asynchronously* -- don't block
+                    // this thread waiting for the user's response! After the user
+                    // sees the explanation, try again to request the permission.
+                } else {
+                    // No explanation needed; request the permission
+                    ActivityCompat.requestPermissions(PreviewPhotoActivity.this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+                }
+            } else {
+                // Permission has already been granted
+                downloadPhotoFromApi(mUrl);
+            }
+        }else{
+            downloadPhotoFromApi(mUrl);
+        }
+    }
+
+    //Handle permission result
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    //downloadPhotoFromApi(mUrl);
+                    Toast.makeText(this,"Permission granted ... !",Toast.LENGTH_SHORT).show();
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(this,"Permission denied ... !",Toast.LENGTH_SHORT).show();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request.
+        }
+    }
 
 }
