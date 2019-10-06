@@ -1,14 +1,17 @@
 package com.fox.assignment403;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -38,8 +41,20 @@ public class PreviewPhotoActivity extends AppCompatActivity {
     private Photo photo;
     private ImageView imageView;
     private FloatingActionsMenu menuMultipleActions;
-    public static final String MESSAGE_PROGRESS  = "message_progress";
     private String [] link = new String[10];
+    private long downloadID;
+
+    private BroadcastReceiver onDownloadComplete = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //Fetching the download id received with the broadcast
+            long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+            //Checking if the received broadcast is for our enqueued download by matching download id
+            if (downloadID == id) {
+                Toast.makeText(PreviewPhotoActivity.this, "Download Completed", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +63,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         setContentView(R.layout.activity_preview_photo);
         initViews();
+        registerReceiver(onDownloadComplete,new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         Intent intent = getIntent();
         if(intent != null){
             photo = (Photo) intent.getSerializableExtra("photo");
@@ -63,6 +79,12 @@ public class PreviewPhotoActivity extends AppCompatActivity {
         //Add button download <m,z,c,l,o>
         getPhotoUrl();
         initDownloadButton(link);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(onDownloadComplete);
     }
 
     private void initViews(){
@@ -133,19 +155,22 @@ public class PreviewPhotoActivity extends AppCompatActivity {
         //Allow type of network to download files
         request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
         request.setAllowedOverRoaming(false);
+        //request.setRequiresCharging(false);
+        //request.setAllowedOverMetered(true);
         request.setTitle("File Download"); //Set title in download notification
         request.setDescription("File is being downloaded..."); ////Set description in download notification
         request.allowScanningByMediaScanner();
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName); //Get current timestamp as file name
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_PICTURES, fileName); //Get current timestamp as file name
         request.setVisibleInDownloadsUi(true);
         //Get download service and enqueue file
         DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-        manager.enqueue(request);
+        downloadID = manager.enqueue(request);
     }
 
     private void checkPermission(String mUrl) throws IOException {
-        if(Build.VERSION.SDK_INT >= 23){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             if (ContextCompat.checkSelfPermission(PreviewPhotoActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 // Permission is not granted
                 // Should we show an explanation?
