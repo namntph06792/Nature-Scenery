@@ -4,18 +4,24 @@ import com.fox.assignment403.BuildConfig;
 
 public class Constants {
 
-    private static final String FLICKR_DOMAIN = "https://www.flickr.com/services/rest/?";
+    public static final String FLICKR_DOMAIN = "https://www.flickr.com/services/rest/";
 
-    private static final String METHOD = "method=flickr.favorites.getList";
+    public static final String METHOD = "flickr.favorites.getList";
 
-    private static final String PARAM = "views%2C+media%2C+path_alias%2C+url_sq%2C+url_t%2C+url_s%2C+url_q%2C+url_m%2C+url_n%2C+url_z%2C+url_c%2C+url_l%2C+url_o";
+    public static final String OPTION = "views, media, path_alias, url_sq, url_t, url_s, url_q, url_m, url_n, url_z, url_c, url_l, url_o";
 
-    public static final String FORMAT = "&format=json&nojsoncallback=1";
-
-    public static final String FAVOURITE_PHOTO_API = FLICKR_DOMAIN + METHOD + "&api_key=" + BuildConfig.API_KEY + "&user_id=" + BuildConfig.USER_ID + "&extras=" + PARAM;
+    public static final String FORMAT = "json";
 
     public static final int NUM_COLUMNS = 2;
 
     public static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 999;
+
+    //public static final String API_KEY = BuildConfig.API_KEY;
+
+    //public static final String USER_ID = BuildConfig.USER_ID;
+
+    public static final String API_KEY = "82e599050abbee5f37e9daceb4880a94";
+
+    public static final String USER_ID = "184508970@N03";
 
 }

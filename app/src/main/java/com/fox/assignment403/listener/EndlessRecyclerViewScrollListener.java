@@ -1,5 +1,7 @@
 package com.fox.assignment403.listener;
 
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -19,14 +21,14 @@ public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnS
 
     RecyclerView.LayoutManager mLayoutManager;
 
-//    public EndlessRecyclerViewScrollListener(LinearLayoutManager layoutManager) {
-//        this.mLayoutManager = layoutManager;
-//    }
-//
-//    public EndlessRecyclerViewScrollListener(GridLayoutManager layoutManager) {
-//        this.mLayoutManager = layoutManager;
-//        visibleThreshold = visibleThreshold * layoutManager.getSpanCount();
-//    }
+    public EndlessRecyclerViewScrollListener(LinearLayoutManager layoutManager) {
+        this.mLayoutManager = layoutManager;
+    }
+
+    public EndlessRecyclerViewScrollListener(GridLayoutManager layoutManager) {
+        this.mLayoutManager = layoutManager;
+        visibleThreshold = visibleThreshold * layoutManager.getSpanCount();
+    }
 
     public EndlessRecyclerViewScrollListener(StaggeredGridLayoutManager layoutManager) {
         this.mLayoutManager = layoutManager;
@@ -59,11 +61,11 @@ public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnS
             // get maximum element within the list
             lastVisibleItemPosition = getLastVisibleItem(lastVisibleItemPositions);
         }
-//        else if (mLayoutManager instanceof GridLayoutManager) {
-//            lastVisibleItemPosition = ((GridLayoutManager) mLayoutManager).findLastVisibleItemPosition();
-//        } else if (mLayoutManager instanceof LinearLayoutManager) {
-//            lastVisibleItemPosition = ((LinearLayoutManager) mLayoutManager).findLastVisibleItemPosition();
-//        }
+        else if (mLayoutManager instanceof GridLayoutManager) {
+            lastVisibleItemPosition = ((GridLayoutManager) mLayoutManager).findLastVisibleItemPosition();
+        } else if (mLayoutManager instanceof LinearLayoutManager) {
+            lastVisibleItemPosition = ((LinearLayoutManager) mLayoutManager).findLastVisibleItemPosition();
+        }
 
         // If the total item count is zero and the previous isn't, assume the
         // list is invalidated and should be reset back to initial state
