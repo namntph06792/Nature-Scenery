@@ -1,7 +1,6 @@
 package com.fox.assignment403;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -30,6 +29,8 @@ import com.bumptech.glide.request.RequestOptions;
 import com.fox.assignment403.model.Photo;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.github.chrisbanes.photoview.PhotoView;
+import com.github.chrisbanes.photoview.PhotoViewAttacher;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +40,7 @@ import static com.fox.assignment403.constant.Constants.MY_PERMISSIONS_REQUEST_WR
 public class PreviewPhotoActivity extends AppCompatActivity {
 
     private Photo photo;
-    private ImageView imageView;
+    private PhotoView imageView;
     private FloatingActionsMenu menuMultipleActions;
     private String [] link = new String[10];
     private long downloadID;
@@ -75,11 +76,14 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                 .error(R.drawable.dummy)
                 .apply(requestOptions)
                 .transition(new DrawableTransitionOptions().crossFade())
+                .skipMemoryCache(false)
                 .into(imageView);
         //Add button download <m,z,c,l,o>
         getPhotoUrl();
         initDownloadButton(link);
     }
+
+
 
     @Override
     public void onDestroy() {

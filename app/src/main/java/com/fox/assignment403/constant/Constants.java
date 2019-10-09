@@ -2,6 +2,9 @@ package com.fox.assignment403.constant;
 
 import com.fox.assignment403.BuildConfig;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 public class Constants {
 
     public static final String FLICKR_DOMAIN = "https://www.flickr.com/services/rest/";
@@ -16,12 +19,16 @@ public class Constants {
 
     public static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 999;
 
-    //public static final String API_KEY = BuildConfig.API_KEY;
+    public static final String API_KEY = BuildConfig.API_KEY;
 
-    //public static final String USER_ID = BuildConfig.USER_ID;
+    public static String USER_ID;
 
-    public static final String API_KEY = "82e599050abbee5f37e9daceb4880a94";
-
-    public static final String USER_ID = "184508970@N03";
+    static {
+        try {
+            USER_ID = URLDecoder.decode(BuildConfig.USER_ID, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

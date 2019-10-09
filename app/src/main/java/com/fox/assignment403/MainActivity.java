@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
     //Initial value
     private int page = 1;
 
-
     private List<Photo> mImageUrls = new ArrayList<>();
 
     @Override
@@ -61,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this.page = 1;
                 mImageUrls.clear();
                 fetchPhotoFromApi(MainActivity.this.page,1);
-                onScrollToLoadMore();            }
+                onScrollToLoadMore();
+            }
         });
 
         onScrollToLoadMore();
@@ -96,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
 
                         @Override
                         public void onResponse(Object response) {
-                            Log.d("Ressponse",response+ "");
                             swipeRefreshLayout.setRefreshing(false);
                             FavoritePhoto favouritePhoto = (FavoritePhoto) response;
                             List<Photo> photos = favouritePhoto.getPhotos().getPhoto();

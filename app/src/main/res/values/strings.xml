@@ -3,6 +3,7 @@
 
     <string name="title_activity_splash">Nature Scenery</string>
 
-    <string name="image_description" />
+    <string name="image_description"/>
+    <string name="view_description">TextView</string>
 
 </resources>

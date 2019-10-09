@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -57,7 +58,10 @@ public class StaggeredRecycleViewAdapter extends RecyclerView.Adapter<StaggeredR
                 .error(R.drawable.dummy)
                 .apply(requestOptions)
                 .transition(new DrawableTransitionOptions().crossFade())
+                .skipMemoryCache(false)
                 .into(holder.imageView);
+
+        holder.tvView.setText(photo.getViews().trim());
 
         holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,24 +85,16 @@ public class StaggeredRecycleViewAdapter extends RecyclerView.Adapter<StaggeredR
         return mImageUrls.size();
     }
 
-    public void onClear(){
-        mImageUrls.clear();
-        notifyDataSetChanged();
-    }
-
-    public void onUpdate(Photo list){
-        mImageUrls.add(list);
-        notifyDataSetChanged();
-    }
-
     public class ViewHolder extends RecyclerView.ViewHolder{
         private ConstraintLayout constraintLayout;
         private ImageView imageView;
+        private TextView tvView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             this.constraintLayout = itemView.findViewById(R.id.constrainContainer);
             this.imageView = itemView.findViewById(R.id.imageView_widget);
+            this.tvView = itemView.findViewById(R.id.tvView);
         }
     }
 
