@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
                     .addBodyParameter("format", FORMAT)
                     .addBodyParameter("extras", OPTION)
                     .addBodyParameter("nojsoncallback", "1")
-                    .addBodyParameter("per_page", "10")
+                    .addBodyParameter("per_page", "8")
                     .addBodyParameter("page", String.valueOf(page))
                     .setTag("test")
                     .setPriority(Priority.MEDIUM)

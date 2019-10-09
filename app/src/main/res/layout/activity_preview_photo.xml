@@ -8,13 +8,13 @@
     android:background="@color/gray_overlay"
     tools:context=".PreviewPhotoActivity">
 
-    <com.github.chrisbanes.photoview.PhotoView
+    <ImageView
         android:id="@+id/imageView_widget"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
-        android:scaleType="fitXY"
         android:contentDescription="@string/image_description"
+        android:scaleType="centerCrop"
         android:src="@drawable/dummy" />
 
     <com.getbase.floatingactionbutton.FloatingActionsMenu

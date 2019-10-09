@@ -29,8 +29,6 @@ import com.bumptech.glide.request.RequestOptions;
 import com.fox.assignment403.model.Photo;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
-import com.github.chrisbanes.photoview.PhotoView;
-import com.github.chrisbanes.photoview.PhotoViewAttacher;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,10 +38,11 @@ import static com.fox.assignment403.constant.Constants.MY_PERMISSIONS_REQUEST_WR
 public class PreviewPhotoActivity extends AppCompatActivity {
 
     private Photo photo;
-    private PhotoView imageView;
+    private ImageView imageView;
     private FloatingActionsMenu menuMultipleActions;
     private String [] link = new String[10];
     private long downloadID;
+    private String url_o, url_l, url_c, url_z, url_m;
 
     private BroadcastReceiver onDownloadComplete = new BroadcastReceiver() {
         @Override
@@ -97,11 +96,11 @@ public class PreviewPhotoActivity extends AppCompatActivity {
     }
 
     private void getPhotoUrl(){
-        link[0] = photo.getUrlO().trim();
-        link[1] = photo.getUrlL().trim();
-        link[2] = photo.getUrlC().trim();
-        link[3] = photo.getUrlZ().trim();
-        link[4] = photo.getUrlM().trim();
+        link[0] = photo.getUrlO();
+        link[1] = photo.getUrlL();
+        link[2]= photo.getUrlC();
+        link[3] = photo.getUrlZ();
+        link[4]= photo.getUrlM();
     }
 
     private void initDownloadButton(final String [] url){
@@ -134,7 +133,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         try {
-                            checkPermission(url[j]);
+                            checkPermission(url[j].trim());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
