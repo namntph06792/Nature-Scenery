@@ -23,6 +23,7 @@ import android.webkit.URLUtil;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bogdwellers.pinchtozoom.ImageMatrixTouchHandler;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
@@ -42,7 +43,6 @@ public class PreviewPhotoActivity extends AppCompatActivity {
     private FloatingActionsMenu menuMultipleActions;
     private String [] link = new String[10];
     private long downloadID;
-    private String url_o, url_l, url_c, url_z, url_m;
 
     private BroadcastReceiver onDownloadComplete = new BroadcastReceiver() {
         @Override
@@ -77,11 +77,11 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                 .transition(new DrawableTransitionOptions().crossFade())
                 .skipMemoryCache(false)
                 .into(imageView);
+        imageView.setOnTouchListener(new ImageMatrixTouchHandler(this));
         //Add button download <m,z,c,l,o>
         getPhotoUrl();
         initDownloadButton(link);
     }
-
 
 
     @Override
@@ -98,9 +98,9 @@ public class PreviewPhotoActivity extends AppCompatActivity {
     private void getPhotoUrl(){
         link[0] = photo.getUrlO();
         link[1] = photo.getUrlL();
-        link[2]= photo.getUrlC();
+        link[2] = photo.getUrlC();
         link[3] = photo.getUrlZ();
-        link[4]= photo.getUrlM();
+        link[4] = photo.getUrlM();
     }
 
     private void initDownloadButton(final String [] url){
@@ -144,7 +144,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
         }
     }
 
-    private void downloadPhotoFromApi(String mUrl) throws IOException {
+    private void downloadPhotoFromApi(String mUrl) {
         File rootDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Flickr");
         if(!rootDirectory.exists()){
             rootDirectory.mkdir();
@@ -208,7 +208,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                     //downloadPhotoFromApi(mUrl);
-                    Toast.makeText(this,"Permission granted ... !",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this,"Permission granted ... , you can start to download photo now !",Toast.LENGTH_SHORT).show();
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
@@ -216,7 +216,6 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                 }
                 return;
             }
-
             // other 'case' lines to check for other
             // permissions this app might request.
         }
